@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-Commerce API — QA report</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff; --fg: #18181b; --muted: #71717a; --line: #e4e4e7;
+    --card: #fafafa; --crit: #b91c1c; --high: #c2410c; --med: #a16207; --low: #3f6212;
+    --ok: #15803d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0b0b0d; --fg: #ededf0; --muted: #a1a1aa; --line: #27272a;
+            --card: #141417; --crit: #f87171; --high: #fb923c; --med: #fbbf24; --low: #a3e635;
+            --ok: #4ade80; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 56rem; margin: 0 auto; padding: 3.5rem 1.5rem 5rem; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 1.75rem; margin-bottom: 2rem; }
+  h1 { font-size: 1.65rem; margin: 0 0 .35rem; letter-spacing: -.01em; }
+  .meta { color: var(--muted); font-size: .9rem; }
+  .meta a { color: inherit; }
+  h2 { font-size: 1.05rem; margin: 2.75rem 0 1rem; letter-spacing: .01em; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 1px;
+           background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .stat { background: var(--bg); padding: 1.1rem 1.25rem; }
+  .stat .n { font-size: 1.75rem; font-weight: 600; letter-spacing: -.02em; }
+  .stat .l { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .07em; margin-top: .15rem; }
+  .cta { display: inline-block; margin: 1.75rem 0 0; padding: .7rem 1.25rem; border-radius: 8px;
+         background: var(--fg); color: var(--bg); text-decoration: none; font-weight: 500; font-size: .95rem; }
+  .note { border-left: 3px solid var(--line); padding: .2rem 0 .2rem 1.1rem; color: var(--muted);
+          margin: 1.5rem 0 0; font-size: .93rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .93rem; }
+  th { text-align: left; font-weight: 500; color: var(--muted); font-size: .75rem;
+       text-transform: uppercase; letter-spacing: .07em; padding: 0 .75rem .6rem 0; border-bottom: 1px solid var(--line); }
+  td { padding: .7rem .75rem .7rem 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:last-child, th:last-child { padding-right: 0; }
+  .sev { font-weight: 600; white-space: nowrap; font-size: .82rem; letter-spacing: .02em; }
+  .Critical { color: var(--crit); } .High { color: var(--high); }
+  .Medium { color: var(--med); } .Low { color: var(--low); }
+  .num { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .bar { height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; min-width: 5rem; }
+  .bar span { display: block; height: 100%; background: var(--ok); }
+  footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line);
+           color: var(--muted); font-size: .88rem; }
+  a { color: inherit; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .88em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>E-Commerce API — QA report</h1>
+  <div class="meta">
+    Run 1 on <code>main</code> at <code>d02ddb3</code> &middot; Fri, 28 Aug 2026 15:06:49 UTC &middot; 3.3s
+    &middot; <a href="https://github.com/arslanyasin330/backend-qa-task">repository</a>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat"><div class="n">52</div><div class="l">Requests</div></div>
+  <div class="stat"><div class="n">59</div><div class="l">HTTP calls</div></div>
+  <div class="stat"><div class="n">217</div><div class="l">Assertions</div></div>
+  <div class="stat"><div class="n">197</div><div class="l">Passing</div></div>
+  <div class="stat"><div class="n">20</div><div class="l">Failing</div></div>
+  <div class="stat"><div class="n">8</div><div class="l">Defects</div></div>
+</div>
+
+<a class="cta" href="reports/latest/">Open the full newman report &rarr;</a>
+
+<p class="note">
+  The failing assertions are expected. This suite asserts what the API is <em>specified</em> to do
+  rather than what it currently does, so each known defect shows up as a failing test naming the
+  problem, instead of being quietly recorded as correct behaviour.
+  Every failure below is a documented issue &mdash; nothing unaccounted for.
+</p>
+
+<h2>Defects reproducing in this run</h2>
+<table>
+  <thead><tr><th style="width:4.5rem">Severity</th><th>Issue</th><th style="width:5rem">Checks</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="sev Critical">Critical</td>
+      <td>Login issues a token for any password <span class="num">&middot; #1</span></td>
+      <td class="num">4</td>
+    </tr>
+    <tr>
+      <td class="sev Critical">Critical</td>
+      <td>Any authenticated user can read anyone's orders <span class="num">&middot; #2</span></td>
+      <td class="num">4</td>
+    </tr>
+    <tr>
+      <td class="sev Critical">Critical</td>
+      <td>Order total ignores quantity <span class="num">&middot; #3</span></td>
+      <td class="num">2</td>
+    </tr>
+    <tr>
+      <td class="sev High">High</td>
+      <td>Stock checked per line, so duplicate lines oversell <span class="num">&middot; #4</span></td>
+      <td class="num">2</td>
+    </tr>
+    <tr>
+      <td class="sev Medium">Medium</td>
+      <td>isDetailed: true with no description <span class="num">&middot; #5</span></td>
+      <td class="num">2</td>
+    </tr>
+    <tr>
+      <td class="sev Medium">Medium</td>
+      <td>String qty bypasses validation <span class="num">&middot; #6</span></td>
+      <td class="num">2</td>
+    </tr>
+    <tr>
+      <td class="sev Medium">Medium</td>
+      <td>Stock never decrements <span class="num">&middot; #7</span></td>
+      <td class="num">1</td>
+    </tr>
+    <tr>
+      <td class="sev Medium">Medium</td>
+      <td>Malformed JSON returns an HTML error page <span class="num">&middot; #8</span></td>
+      <td class="num">3</td>
+    </tr>
+  </tbody>
+</table>
+<p class="note">Full write-ups, with repro steps and impact, are in
+  <a href="https://github.com/arslanyasin330/backend-qa-task/blob/main/BUGS.md">BUGS.md</a>.</p>
+
+<h2>Coverage by area</h2>
+<table>
+  <thead><tr><th>Area</th><th style="width:6rem">Requests</th><th style="width:6rem">Failing</th><th style="width:10rem">Passing</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Setup</td>
+      <td class="num">5</td>
+      <td class="num">&mdash;</td>
+      <td><div class="bar" title="100% of checks passing"><span style="width:100%"></span></div></td>
+    </tr>
+    <tr>
+      <td>Register</td>
+      <td class="num">6</td>
+      <td class="num">&mdash;</td>
+      <td><div class="bar" title="100% of checks passing"><span style="width:100%"></span></div></td>
+    </tr>
+    <tr>
+      <td>Login</td>
+      <td class="num">5</td>
+      <td class="num">4</td>
+      <td><div class="bar" title="79% of checks passing"><span style="width:79%"></span></div></td>
+    </tr>
+    <tr>
+      <td>Products</td>
+      <td class="num">9</td>
+      <td class="num">2</td>
+      <td><div class="bar" title="95% of checks passing"><span style="width:95%"></span></div></td>
+    </tr>
+    <tr>
+      <td>Orders (authorization)</td>
+      <td class="num">9</td>
+      <td class="num">2</td>
+      <td><div class="bar" title="94% of checks passing"><span style="width:94%"></span></div></td>
+    </tr>
+    <tr>
+      <td>Orders (validation)</td>
+      <td class="num">17</td>
+      <td class="num">7</td>
+      <td><div class="bar" title="89% of checks passing"><span style="width:89%"></span></div></td>
+    </tr>
+    <tr>
+      <td>Orders (happy path and totals)</td>
+      <td class="num">8</td>
+      <td class="num">5</td>
+      <td><div class="bar" title="86% of checks passing"><span style="width:86%"></span></div></td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="note">Counted per HTTP call, which runs a little ahead of the 52 requests in
+  the collection: a few pre-request scripts fetch live product data first, and the products area sends
+  one detail request per product,
+  so the rule that <code>isDetailed</code> implies a description is checked across all of them rather
+  than on a hardcoded pair.</p>
+
+<footer>
+  Generated automatically by GitHub Actions on every push, pull request and daily schedule.
+  Historical runs stay at <code>/reports/&lt;run number&gt;/</code>.
+</footer>
+
+</div>
+</body>
+</html>
