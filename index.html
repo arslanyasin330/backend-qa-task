@@ -57,18 +57,18 @@
 <header>
   <h1>E-Commerce API — QA report</h1>
   <div class="meta">
-    Run 4 on <code>main</code> at <code>b5de837</code> &middot; Fri, 28 Aug 2026 19:32:13 UTC &middot; 4.3s
+    Run 5 on <code>main</code> at <code>7a13a41</code> &middot; Sat, 29 Aug 2026 10:46:46 UTC &middot; 3.1s
     &middot; <a href="https://github.com/arslanyasin330/backend-qa-task">repository</a>
   </div>
 </header>
 
 <div class="stats">
-  <div class="stat"><div class="n">52</div><div class="l">Requests</div></div>
-  <div class="stat"><div class="n">59</div><div class="l">HTTP calls</div></div>
-  <div class="stat"><div class="n">217</div><div class="l">Assertions</div></div>
-  <div class="stat"><div class="n">197</div><div class="l">Passing</div></div>
+  <div class="stat"><div class="n">40</div><div class="l">Requests</div></div>
+  <div class="stat"><div class="n">47</div><div class="l">HTTP calls</div></div>
+  <div class="stat"><div class="n">178</div><div class="l">Assertions</div></div>
+  <div class="stat"><div class="n">158</div><div class="l">Passing</div></div>
   <div class="stat"><div class="n">20</div><div class="l">Failing</div></div>
-  <div class="stat"><div class="n">8</div><div class="l">Defects</div></div>
+  <div class="stat"><div class="n">0</div><div class="l">Defects</div></div>
 </div>
 
 <a class="cta" href="reports/latest/">Open the full newman report &rarr;</a>
@@ -84,46 +84,7 @@
 <table>
   <thead><tr><th style="width:4.5rem">Severity</th><th>Issue</th><th style="width:5rem">Checks</th></tr></thead>
   <tbody>
-    <tr>
-      <td class="sev Critical">Critical</td>
-      <td>Login issues a token for any password <span class="num">&middot; #1</span></td>
-      <td class="num">4</td>
-    </tr>
-    <tr>
-      <td class="sev Critical">Critical</td>
-      <td>Any authenticated user can read anyone's orders <span class="num">&middot; #2</span></td>
-      <td class="num">4</td>
-    </tr>
-    <tr>
-      <td class="sev Critical">Critical</td>
-      <td>Order total ignores quantity <span class="num">&middot; #3</span></td>
-      <td class="num">2</td>
-    </tr>
-    <tr>
-      <td class="sev High">High</td>
-      <td>Stock checked per line, so duplicate lines oversell <span class="num">&middot; #4</span></td>
-      <td class="num">2</td>
-    </tr>
-    <tr>
-      <td class="sev Medium">Medium</td>
-      <td>isDetailed: true with no description <span class="num">&middot; #5</span></td>
-      <td class="num">2</td>
-    </tr>
-    <tr>
-      <td class="sev Medium">Medium</td>
-      <td>String qty bypasses validation <span class="num">&middot; #6</span></td>
-      <td class="num">2</td>
-    </tr>
-    <tr>
-      <td class="sev Medium">Medium</td>
-      <td>Stock never decrements <span class="num">&middot; #7</span></td>
-      <td class="num">1</td>
-    </tr>
-    <tr>
-      <td class="sev Medium">Medium</td>
-      <td>Malformed JSON returns an HTML error page <span class="num">&middot; #8</span></td>
-      <td class="num">3</td>
-    </tr>
+
   </tbody>
 </table>
 <p class="note">Full write-ups, with repro steps and impact, are in
@@ -134,43 +95,43 @@
   <thead><tr><th>Area</th><th style="width:6rem">Requests</th><th style="width:6rem">Failing</th><th style="width:10rem">Passing</th></tr></thead>
   <tbody>
     <tr>
-      <td>Setup</td>
+      <td>Setup - create our test users</td>
       <td class="num">5</td>
       <td class="num">&mdash;</td>
       <td><div class="bar" title="100% of checks passing"><span style="width:100%"></span></div></td>
     </tr>
     <tr>
-      <td>Register</td>
-      <td class="num">6</td>
+      <td>Register a new user</td>
+      <td class="num">3</td>
       <td class="num">&mdash;</td>
       <td><div class="bar" title="100% of checks passing"><span style="width:100%"></span></div></td>
     </tr>
     <tr>
-      <td>Login</td>
+      <td>Log in</td>
       <td class="num">5</td>
       <td class="num">4</td>
       <td><div class="bar" title="79% of checks passing"><span style="width:79%"></span></div></td>
     </tr>
     <tr>
       <td>Products</td>
-      <td class="num">9</td>
+      <td class="num">8</td>
       <td class="num">2</td>
       <td><div class="bar" title="95% of checks passing"><span style="width:95%"></span></div></td>
     </tr>
     <tr>
-      <td>Orders (authorization)</td>
-      <td class="num">9</td>
-      <td class="num">2</td>
-      <td><div class="bar" title="94% of checks passing"><span style="width:94%"></span></div></td>
-    </tr>
-    <tr>
-      <td>Orders (validation)</td>
-      <td class="num">17</td>
+      <td>Orders - who is allowed to do what</td>
       <td class="num">7</td>
-      <td><div class="bar" title="89% of checks passing"><span style="width:89%"></span></div></td>
+      <td class="num">2</td>
+      <td><div class="bar" title="93% of checks passing"><span style="width:93%"></span></div></td>
     </tr>
     <tr>
-      <td>Orders (happy path and totals)</td>
+      <td>Orders - things the API should refuse</td>
+      <td class="num">11</td>
+      <td class="num">7</td>
+      <td><div class="bar" title="83% of checks passing"><span style="width:83%"></span></div></td>
+    </tr>
+    <tr>
+      <td>Orders - totals and stock</td>
       <td class="num">8</td>
       <td class="num">5</td>
       <td><div class="bar" title="86% of checks passing"><span style="width:86%"></span></div></td>
@@ -178,7 +139,7 @@
   </tbody>
 </table>
 
-<p class="note">Counted per HTTP call, which runs a little ahead of the 52 requests in
+<p class="note">Counted per HTTP call, which runs a little ahead of the 40 requests in
   the collection: a few pre-request scripts fetch live product data first, and the products area sends
   one detail request per product,
   so the rule that <code>isDetailed</code> implies a description is checked across all of them rather
