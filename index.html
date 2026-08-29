@@ -57,16 +57,16 @@
 <header>
   <h1>E-Commerce API — QA report</h1>
   <div class="meta">
-    Run 6 on <code>main</code> at <code>5eb997a</code> &middot; Sat, 29 Aug 2026 11:00:22 UTC &middot; 3.0s
+    Run 7 on <code>main</code> at <code>044cd8f</code> &middot; Sat, 29 Aug 2026 12:01:14 UTC &middot; 3.8s
     &middot; <a href="https://github.com/arslanyasin330/backend-qa-task">repository</a>
   </div>
 </header>
 
 <div class="stats">
-  <div class="stat"><div class="n">40</div><div class="l">Requests</div></div>
-  <div class="stat"><div class="n">47</div><div class="l">HTTP calls</div></div>
-  <div class="stat"><div class="n">178</div><div class="l">Assertions</div></div>
-  <div class="stat"><div class="n">158</div><div class="l">Passing</div></div>
+  <div class="stat"><div class="n">42</div><div class="l">Requests</div></div>
+  <div class="stat"><div class="n">49</div><div class="l">HTTP calls</div></div>
+  <div class="stat"><div class="n">187</div><div class="l">Assertions</div></div>
+  <div class="stat"><div class="n">167</div><div class="l">Passing</div></div>
   <div class="stat"><div class="n">20</div><div class="l">Failing</div></div>
   <div class="stat"><div class="n">0</div><div class="l">Defects</div></div>
 </div>
@@ -95,43 +95,43 @@
   <thead><tr><th>Area</th><th style="width:6rem">Requests</th><th style="width:6rem">Failing</th><th style="width:10rem">Passing</th></tr></thead>
   <tbody>
     <tr>
-      <td>Setup - create the test users</td>
+      <td>Setup - register the users and save their tokens</td>
       <td class="num">5</td>
       <td class="num">&mdash;</td>
       <td><div class="bar" title="100% of checks passing"><span style="width:100%"></span></div></td>
     </tr>
     <tr>
-      <td>Register a new user</td>
-      <td class="num">3</td>
+      <td>Register users and check the sign up rules</td>
+      <td class="num">5</td>
       <td class="num">&mdash;</td>
       <td><div class="bar" title="100% of checks passing"><span style="width:100%"></span></div></td>
     </tr>
     <tr>
-      <td>Log in</td>
+      <td>Log in and check the password rules</td>
       <td class="num">5</td>
       <td class="num">4</td>
       <td><div class="bar" title="79% of checks passing"><span style="width:79%"></span></div></td>
     </tr>
     <tr>
-      <td>Products</td>
+      <td>Products - the list, one product, and the description rule</td>
       <td class="num">8</td>
       <td class="num">2</td>
       <td><div class="bar" title="95% of checks passing"><span style="width:95%"></span></div></td>
     </tr>
     <tr>
-      <td>Orders - who is allowed to do what</td>
+      <td>Orders - who is allowed to create and read them</td>
       <td class="num">7</td>
       <td class="num">2</td>
       <td><div class="bar" title="93% of checks passing"><span style="width:93%"></span></div></td>
     </tr>
     <tr>
-      <td>Orders - things the API should refuse</td>
+      <td>Orders - bad data the API should refuse</td>
       <td class="num">11</td>
       <td class="num">7</td>
       <td><div class="bar" title="83% of checks passing"><span style="width:83%"></span></div></td>
     </tr>
     <tr>
-      <td>Orders - totals and stock</td>
+      <td>Orders - totals, stock and ownership</td>
       <td class="num">8</td>
       <td class="num">5</td>
       <td><div class="bar" title="86% of checks passing"><span style="width:86%"></span></div></td>
@@ -139,7 +139,7 @@
   </tbody>
 </table>
 
-<p class="note">Counted per HTTP call, which runs a little ahead of the 40 requests in
+<p class="note">Counted per HTTP call, which runs a little ahead of the 42 requests in
   the collection: a few pre-request scripts fetch live product data first, and the products area sends
   one detail request per product,
   so the rule that <code>isDetailed</code> implies a description is checked across all of them rather
