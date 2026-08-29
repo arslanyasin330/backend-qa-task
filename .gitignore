@@ -1,0 +1,7 @@
+node_modules/
+test-reports/
+reports/
+submission/
+*.zip
+.idea/
+.DS_Store

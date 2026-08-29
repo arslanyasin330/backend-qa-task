@@ -1,0 +1,111 @@
+name: API tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # every morning at 07:00 UTC, so environment drift gets caught without anyone looking
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  newman:
+    name: Run Postman collection
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run the collection
+        # The suite fails on purpose where the API breaks its own spec, so newman's
+        # exit code isn't the signal we want. The gate is the next step.
+        run: |
+          mkdir -p test-reports
+          newman run postman/ecommerce-api-tests.postman_collection.json \
+            -e postman/ecommerce-api-environment.postman_environment.json \
+            --reporters cli,json,htmlextra \
+            --reporter-json-export test-reports/results.json \
+            --reporter-htmlextra-export test-reports/report.html \
+            --reporter-htmlextra-title "E-Commerce API QA" \
+            --timeout-request 15000 \
+            --suppress-exit-code
+
+      - name: Check for regressions
+        run: node scripts/check-results.js test-reports/results.json
+
+      - name: Write run summary
+        if: always()
+        run: |
+          if [ ! -f test-reports/results.json ]; then
+            echo "No report produced — the run itself failed." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          TOTAL=$(jq '.run.stats.assertions.total' test-reports/results.json)
+          FAILED=$(jq '.run.stats.assertions.failed // 0' test-reports/results.json)
+          REQS=$(jq '.run.stats.requests.total' test-reports/results.json)
+          MS=$(jq '.run.timings.completed - .run.timings.started' test-reports/results.json)
+
+          {
+            echo "## API test run"
+            echo ""
+            echo "**[Open the full report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/${{ github.run_number }}/)**"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Requests | $REQS |"
+            echo "| Assertions | $TOTAL |"
+            echo "| Failing | $FAILED |"
+            echo "| Duration | ${MS}ms |"
+            echo ""
+            echo "The failures are expected. This suite asserts what the API is supposed to do,"
+            echo "so the known defects surface as red. See BUGS.md for the write-ups."
+            echo ""
+            echo "### Defects currently reproducing"
+            echo ""
+            jq -r '.run.failures[].source.name' test-reports/results.json \
+              | grep '^\[BUG\]' | sort -u | sed 's/^/- /'
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-report-${{ github.run_number }}
+          path: test-reports/
+          retention-days: 30
+
+      # Publishes the HTML report so it can be read in a browser rather than
+      # downloaded as a zip. Latest run always lives at /reports/latest/.
+      - name: Assemble the published report
+        if: always() && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p site/reports/${{ github.run_number }}
+          cp test-reports/report.html site/reports/${{ github.run_number }}/index.html
+          cp test-reports/results.json site/reports/${{ github.run_number }}/results.json
+          cp -r site/reports/${{ github.run_number }} site/reports/latest
+          touch site/.nojekyll
+          node scripts/build-site.js \
+            test-reports/results.json \
+            postman/ecommerce-api-tests.postman_collection.json \
+            site
+
+      - name: Publish to GitHub Pages
+        if: always() && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: site
+          keep_files: true

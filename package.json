@@ -1,0 +1,16 @@
+{
+  "name": "ecommerce-api-qa",
+  "version": "1.0.0",
+  "description": "QA test suite for the e-commerce backend API (Postman/newman)",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test:run --silent && node scripts/check-results.js",
+    "test:run": "mkdir -p test-reports && newman run postman/ecommerce-api-tests.postman_collection.json -e postman/ecommerce-api-environment.postman_environment.json --reporters cli,json,htmlextra --reporter-json-export test-reports/results.json --reporter-htmlextra-export test-reports/report.html --reporter-htmlextra-title \"E-Commerce API QA\" --suppress-exit-code",
+    "report": "open test-reports/report.html || xdg-open test-reports/report.html"
+  },
+  "private": true,
+  "devDependencies": {
+    "newman": "^6.2.1",
+    "newman-reporter-htmlextra": "^1.23.1"
+  }
+}

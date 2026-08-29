@@ -1,0 +1,2608 @@
+{
+  "info": {
+    "_postman_id": "b7e4c2a0-1f3d-4c6b-9a58-ecommerce-qa-2026",
+    "name": "E-Commerce API - QA Test Suite (9 defects, 3 critical)",
+    "description": "# 👋 Welcome - start here\n\nThanks for taking a look. This collection tests the e-commerce API end to end, and it\nis written so you can understand it by reading it, without opening a single script.\n\nEverything below takes about two minutes.\n\n---\n\n## Step 1 - make sure you imported both files\n\nThere are two, and you need both:\n\n| File | What it is |\n|---|---|\n| `ecommerce-api-tests.postman_collection.json` | the tests (this file) |\n| `ecommerce-api-environment.postman_environment.json` | the settings they use |\n\n## Step 2 - select the environment\n\nTop right of the Postman window there is a dropdown that says **No Environment**.\nChange it to **\"E-Commerce API - Test Environment\"**.\n\n> This is the only setup step, and it is the one people forget. If you see every\n> request failing with a strange address error, this dropdown is why.\n\n## Step 3 - press Run\n\nClick the collection name in the sidebar → **Run** → **Run E-Commerce API - QA Test Suite**.\n\nThe suite is 42 requests and 187 checks.\n\nThe whole thing takes about 20 seconds.\n\n**There is nothing to fill in first.** No tokens to paste, no product ids to look up,\nno users to create by hand. The first folder registers its own accounts, logs them in,\nand stores the tokens automatically. Everything after that helps itself.\n\n---\n\n## 🟥 Please read this before you judge the results\n\n**Exactly 20 checks fail on purpose.** The suite is not broken - those failures are the\nwhole point.\n\nThe tests check what the API is *supposed* to do, not what it currently does. So each\nreal problem shows up as a **failing test**, instead of being quietly recorded as if it\nwere correct behaviour.\n\nEvery request that is meant to fail is named `[BUG-1]`, `[BUG-2]` and so on, and the\nnumber points at the write-up in **BUGS.md**.\n\n> **The rule that matters: anything that fails WITHOUT a `[BUG-n]` tag is a genuine\n> new problem.** As of the last run there were none.\n\n---\n\n## 📖 How to read the request names\n\n| If the name starts with | It means |\n|---|---|\n| nothing special | A normal test. It should pass, and it does. |\n| `[BUG-n]` | ❌ **Fails on purpose.** It proves problem number `n` is real. |\n| `[QUESTION-n]` | ⚠️ Passes. Something I want a decision on, not a bug I am certain of. |\n| `[BY DESIGN]` | ✅ Passes. Looks like a bug, is not one. Explanation on the request. |\n\n## 📂 What the folders do\n\n| Folder | What it covers |\n|---|---|\n| **01 - Setup** | Registers the users and saves their tokens. **Run this first.** |\n| **02 - Register** | The email rule, both sides of the password rule, duplicate sign-ups |\n| **03 - Log in** | Whether a password is really checked. The worst problem lives here |\n| **04 - Products** | The list, one product, and the description rule |\n| **05 - Orders: permissions** | Tokens, and whether an order is actually yours |\n| **06 - Orders: bad data** | Bad baskets, bad quantities, unknown products, broken JSON |\n| **07 - Orders: totals & stock** | Totals, stock levels, and ownership |\n\nEvery folder and every request has its own **description tab** - like this one -\nexplaining what it checks and why that is worth checking. Start there.\n\n---\n\n## ⚙️ The settings, if you want to change anything\n\nAll of these live in the environment file. You will not normally need to touch them.\n\n| Setting | What it is for |\n|---|---|\n| `baseUrl` | The address of the API. **Change this one value to point the whole suite at a different environment.** |\n| `seededUserEmail` / `seededUserPassword` | The login for `alice@qa.com`, who the API already has |\n| `aliceOrderId` | An order that belongs to alice (`o-1001`) |\n| `bobOrderId` / `bobUserEmail` | An order belonging to somebody else (`o-1002`), for the ownership tests |\n\nEverything else - the test accounts, their tokens, product ids, prices, stock levels -\nis worked out while the suite runs and cleaned up after itself. Nothing is typed in by\nhand, which is deliberate: this data is held in memory and resets from\ntime to time, and a suite full of hard-coded ids would stop working the first time that\nhappened.\n\n---\n\n## 🐛 What it found\n\nNine problems. Three of them are serious.\n\n| # | In one line | How serious |\n|---|---|---|\n| 1 | **You can log into anyone's account without their password.** | 🔴 Critical |\n| 2 | **Any customer can read any other customer's orders.** | 🔴 Critical |\n| 3 | **Buy 10 of something, get charged for 1.** | 🔴 Critical |\n| 4 | You can buy more of an item than the shop has. | 🟠 High |\n| 5 | Some products promise a description and do not have one. | 🟡 Medium |\n| 6 | A quantity typed as text is accepted and stored. | 🟡 Medium |\n| 7 | Stock never goes down, no matter how much is sold. | 🟡 Medium |\n| 8 | One error returns a web page instead of an error message. | 🟡 Medium |\n| 9 | `Alice@qa.com` and `alice@qa.com` are two different people. | 🟢 Low |\n\nEach one is explained in plain English in **BUGS.md**, with a single command you can\npaste into a terminal to see it happen yourself.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 - 👋 READ ME FIRST - click this folder name to open the guide",
+      "item": [],
+      "description": "# 👋 Welcome — start here\n\n**This folder is empty on purpose.** There are no requests inside it, so expanding the arrow shows nothing — the guide is right here in this panel. It sits at the top so it is the first thing you see after importing.\n\nA longer version lives on the **collection** itself — click *E-Commerce API - QA Test Suite* at the top of the sidebar and read its Overview tab.\n\n---\n\n## Before you run it\n\nYou need **both** files imported:\n\n| File | What it is |\n|---|---|\n| `ecommerce-api-tests.postman_collection.json` | the tests |\n| `ecommerce-api-environment.postman_environment.json` | the settings they use |\n\nThen, top right of the window, change the dropdown from **No Environment** to **E-Commerce API - Test Environment**.\n\n> ⚠️ **This is the step people forget.** If every request fails with a strange address error, this dropdown is why.\n\n## Running it\n\nClick the collection name → **Run** → **Run E-Commerce API - QA Test Suite**. It takes about 20 seconds. 42 requests, 187 checks.\n\n**There is nothing to fill in first.** No tokens to paste, no product ids to look up. Folder 01 registers its own users, logs them in, and stores the tokens automatically.\n\n---\n\n## 🟥 Around 20 checks fail. That is on purpose.\n\nThe tests check what the API is **supposed** to do, not what it currently does. So each real problem shows up as a **failing test**, instead of being quietly recorded as if it were correct.\n\n| Request name starts with | It means |\n|---|---|\n| *(nothing)* | A normal test. It should pass, and it does. |\n| `[BUG-n]` | ❌ Fails on purpose. It proves problem `n` is real. |\n| `[QUESTION-n]` | ⚠️ Passes. Something I want a decision on, not a bug I am sure of. |\n| `[BY DESIGN]` | ✅ Passes. Looks like a bug, is not one. |\n\n> **The rule that matters: anything failing WITHOUT a `[BUG-n]` tag is a genuine new problem.** As of the last run there were none.\n\n---\n\n## 🐛 What it found\n\nNine problems. Three of them are serious.\n\n| # | In one line | How serious |\n|---|---|---|\n| 1 | **You can log into anyone's account without their password.** | 🔴 Critical |\n| 2 | **Any customer can read any other customer's orders.** | 🔴 Critical |\n| 3 | **Buy 10 of something, get charged for 1.** | 🔴 Critical |\n| 4 | You can buy more of an item than the shop has. | 🟠 High |\n| 5 | Some products promise a description and do not have one. | 🟡 Medium |\n| 6 | A quantity typed as text is accepted and stored. | 🟡 Medium |\n| 7 | Stock never goes down, no matter how much is sold. | 🟡 Medium |\n| 8 | One error returns a web page instead of an error message. | 🟡 Medium |\n| 9 | Capital letters make a different account. | 🟢 Low |\n\nEach one is explained in plain English in **BUGS.md**, with a single command you can paste into a terminal to see it happen yourself.\n\n---\n\nEvery folder and every request has its own **Description tab**, and every script and request body has a short note at the top saying what it sends and what should happen. Start anywhere.\n"
+    },
+    {
+      "name": "01 - Setup - register the users and save their tokens",
+      "description": "Runs first. Registers two new users plus a seeded login, and saves the tokens the rest of the suite needs. This is also where a successful sign up is checked.",
+      "item": [
+        {
+          "name": "Register a new test user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "We create a brand new user with a fresh email. We check the API says 201 Created and gives back a token. The email and password are saved for the next requests.",
+            "body": {
+              "mode": "raw",
+              "raw": "// We send a brand new email and a password that follows the rules.\n// The email is built from the clock, so it is never a duplicate.\n// Both values are saved, so the next request can log in with them.\n{\n  \"email\": \"{{testUserEmail}}\",\n  \"password\": \"{{testUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We build a new email using the current time.",
+                  "// This keeps the email unique every time you run the collection.",
+                  "",
+                  "const uniqueEmail = 'test.user.' + Date.now() + '@example.com';",
+                  "",
+                  "pm.collectionVariables.set('testUserEmail', uniqueEmail);",
+                  "pm.collectionVariables.set('testUserPassword', 'pass123');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We create a brand new user with a fresh email.",
+                  "// We check the API says 201 Created and gives back a token.",
+                  "// The email and password are saved for the next requests.",
+                  "",
+                  "pm.test('Status is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response contains a confirmation message', function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('message');",
+                  "});",
+                  "",
+                  "pm.test('The password is NOT sent back in the response', function () {",
+                  "    const password = pm.collectionVariables.get('testUserPassword');",
+                  "    pm.expect(pm.response.text()).to.not.include(password);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Log in as the registered user and save the token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "We log in with the user that was just registered above. We check we get a token back, then save it for the order tests.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The exact same email and password we just registered with.\n// The token that comes back is saved for us, so no copy and paste.\n{\n  \"email\": \"{{testUserEmail}}\",\n  \"password\": \"{{testUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We log in with the user that was just registered above.",
+                  "// We check we get a token back, then save it for the order tests.",
+                  "",
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const loginResult = pm.response.json();",
+                  "",
+                  "pm.test('Response contains a token', function () {",
+                  "    pm.expect(loginResult).to.have.property('token');",
+                  "    pm.expect(loginResult.token).to.be.a('string').and.to.have.length.above(10);",
+                  "});",
+                  "",
+                  "pm.test('The token is a properly formed JWT (three dot-separated parts)', function () {",
+                  "    pm.expect(String(loginResult.token).split('.')).to.have.lengthOf(3);",
+                  "});",
+                  "",
+                  "if (loginResult.token) {",
+                  "    pm.collectionVariables.set('testUserToken', loginResult.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Register a second test user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "We create a second user, so we can test one user reading another user's order. This user is the stranger we use to test bug 2 later.",
+            "body": {
+              "mode": "raw",
+              "raw": "// A second brand new user, with its own fresh email.\n// This is the stranger we use later to check one person cannot read\n// another person's order.\n{\n  \"email\": \"{{secondUserEmail}}\",\n  \"password\": \"pass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Another fresh email, again using the current time.",
+                  "// It is built from the current time, so it is always a new user.",
+                  "",
+                  "pm.collectionVariables.set('secondUserEmail', 'second.user.' + Date.now() + '@example.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We create a second user, so we can test one user reading another user's order.",
+                  "// This user is the stranger we use to test bug 2 later.",
+                  "",
+                  "pm.test('Status is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Log in as the second user and save the token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "We log in as the second user and save that token too. We check a token comes back before we save it.",
+            "body": {
+              "mode": "raw",
+              "raw": "// We log in as that second user.\n// This gives us a token belonging to a completely unrelated person.\n{\n  \"email\": \"{{secondUserEmail}}\",\n  \"password\": \"pass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We log in as the second user and save that token too.",
+                  "// We check a token comes back before we save it.",
+                  "",
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const loginResult = pm.response.json();",
+                  "",
+                  "pm.test('Response contains a token', function () {",
+                  "    pm.expect(loginResult).to.have.property('token');",
+                  "});",
+                  "",
+                  "if (loginResult.token) {",
+                  "    pm.collectionVariables.set('secondUserToken', loginResult.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Log in as the seeded user alice@qa.com and save the token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "We log in as alice, a user the API already has. We save her token to read her own order later.",
+            "body": {
+              "mode": "raw",
+              "raw": "// Alice already exists in the API, we did not create her.\n// Her email and password come from the environment file.\n{\n  \"email\": \"{{seededUserEmail}}\",\n  \"password\": \"{{seededUserPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We log in as alice, a user the API already has.",
+                  "// We save her token to read her own order later.",
+                  "",
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const loginResult = pm.response.json();",
+                  "",
+                  "pm.test('Response contains a token', function () {",
+                  "    pm.expect(loginResult).to.have.property('token');",
+                  "});",
+                  "",
+                  "if (loginResult.token) {",
+                  "    pm.collectionVariables.set('seededUserToken', loginResult.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Register users and check the sign up rules",
+      "description": "The rules on signing up: the email must be valid, the password must be at least 6 characters, and one email cannot be used twice. Both sides of the password limit are covered.",
+      "item": [
+        {
+          "name": "Signing up twice with the same email is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "We sign up again with an email that already exists. The API should refuse it with 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "// We send alice's email, which is already taken.\n// Signing up twice with one email should not be allowed.\n// Expected: 409.\n{\n  \"email\": \"{{seededUserEmail}}\",\n  \"password\": \"pass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We sign up again with an email that already exists.",
+                  "// The API should refuse it with 409.",
+                  "",
+                  "pm.test('Status is 409 Conflict', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('The error explains that the account already exists', function () {",
+                  "    pm.expect(pm.response.json().error).to.match(/already/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "A password shorter than 6 characters is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "We try a 5 character password. The rule says at least 6, so this should be refused with 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The password here is 5 characters - one below the limit.\n// The rule says at least 6, so this must be refused.\n// Expected: 400.\n{\n  \"email\": \"short.password@example.com\",\n  \"password\": \"pass1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We try a 5 character password.",
+                  "// The rule says at least 6, so this should be refused with 400.",
+                  "",
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('The error tells the user it was the password', function () {",
+                  "    pm.expect(pm.response.json().error).to.match(/password/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "A password of the minimum length (6 characters) is accepted",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "The shortest password the rules allow is 6 characters. \"At least 6\" means 6 itself must be accepted. This is the other side of the 5-character test above.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The password here is exactly 6 characters - the shortest allowed.\n// The email is built from the clock so this is always a new account.\n// Expected: 201.\n{\n  \"email\": \"{{sixCharPasswordEmail}}\",\n  \"password\": \"pass12\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// A fresh email so this signup does not clash with an old one.",
+                  "// It is built from the current time, so it is always a new user.",
+                  "",
+                  "pm.collectionVariables.set('sixCharPasswordEmail', 'six.char.password.' + Date.now() + '@example.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// The shortest password the rules allow is 6 characters.",
+                  "// \"At least 6\" means 6 itself must be accepted.",
+                  "// This is the other side of the 5-character test above.",
+                  "",
+                  "pm.test('Status is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "An email that is not a real address is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "// The email here has no @ sign at all, so it is not a real address.\n// The rules say the email must be valid, so this must be refused.\n// Expected: 400, with an error about the email.\n{\n  \"email\": \"no-at-sign.example.com\",\n  \"password\": \"pass123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "We try to sign up with an email that has no @ sign. The rules say the email must be valid, so the API should refuse it with 400."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We try to sign up with an email that has no @ sign.",
+                  "// The rules say the email must be valid, so the API should refuse it with 400.",
+                  "",
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('The error says the problem is the email', function () {",
+                  "    pm.expect(pm.response.json().error).to.match(/email/i);",
+                  "});",
+                  "",
+                  "pm.test('No account is created for an invalid email', function () {",
+                  "    pm.expect(pm.response.json()).to.not.have.property('token');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A very long password is accepted (there is no upper limit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "// The rules give a minimum of 6 characters but no maximum at all.\n// This sends a 200-character password to see where the upper end is.\n// Expected: 201 - there is no limit, which is worth knowing rather than guessing.\n{\n  \"email\": \"{{longPasswordEmail}}\",\n  \"password\": \"{{longPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "The rules set a minimum password length but no maximum. We send a 200-character password to find the upper end. It is accepted, so there is no upper limit."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We build a 200-character password and a fresh email to use it with.",
+                  "// The password is made in code so nobody has to paste 200 characters by hand.",
+                  "",
+                  "pm.collectionVariables.set('longPassword', 'a'.repeat(200));",
+                  "pm.collectionVariables.set('longPasswordEmail', 'long.password.' + Date.now() + '@example.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// The rules set a minimum password length but no maximum.",
+                  "// We send a 200-character password to find the upper end.",
+                  "// It is accepted, so there is no upper limit.",
+                  "",
+                  "pm.test('Status is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('A long password is not rejected for its length', function () {",
+                  "    pm.expect(pm.response.json().error, 'a length limit would show up here').to.be.undefined;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Log in and check the password rules",
+      "description": "Whether the API really checks a password before letting someone in. This is where bug 1 shows up.",
+      "item": [
+        {
+          "name": "[BUG-1] Wrong password must be refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "We log in with a password that is wrong on purpose. It should be refused with 401. It is not - the API lets us in. That is bug 1.",
+            "body": {
+              "mode": "raw",
+              "raw": "// Alice's real email, with a password that is clearly not hers.\n// Should be: 401 and no token.\n// Actually: 200 and a working token. That is bug 1.\n{\n  \"email\": \"{{seededUserEmail}}\",\n  \"password\": \"this-is-definitely-not-alices-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We log in with a password that is wrong on purpose.",
+                  "// It should be refused with 401.",
+                  "// It is not - the API lets us in. That is bug 1.",
+                  "",
+                  "pm.test('Status is 401 Unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('No token is handed out for a wrong password', function () {",
+                  "    pm.expect(pm.response.json()).to.not.have.property('token');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BUG-1] Login with no password must be refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "We log in with no password at all. It should be refused with 401. It is not - the API still gives a token. That is bug 1.",
+            "body": {
+              "mode": "raw",
+              "raw": "// Alice's email only. There is no password field at all.\n// Should be: 400 or 401 and no token.\n// Actually: 200 and a working token. That is bug 1.\n{\n  \"email\": \"{{seededUserEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We log in with no password at all.",
+                  "// It should be refused with 401.",
+                  "// It is not - the API still gives a token. That is bug 1.",
+                  "",
+                  "pm.test('Status is 400 or 401', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+                  "});",
+                  "",
+                  "pm.test('No token is handed out without a password', function () {",
+                  "    pm.expect(pm.response.json()).to.not.have.property('token');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Unknown email cannot log in",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "We log in with an email nobody registered. The API should refuse it with 401.",
+            "body": {
+              "mode": "raw",
+              "raw": "// An email nobody has ever registered.\n// Expected: 401. This one passes, which tells us the email lookup\n// works fine - it is only the password check that is missing.\n{\n  \"email\": \"nobody.has.this.address@example.com\",\n  \"password\": \"pass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We log in with an email nobody registered.",
+                  "// The API should refuse it with 401.",
+                  "",
+                  "pm.test('Status is 401 Unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('No token is handed out for an unknown account', function () {",
+                  "    pm.expect(pm.response.json()).to.not.have.property('token');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Set up - register an email in CAPITAL letters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "This is setup only. It registers the CAPITAL letters version of the email. We only check that it was created, nothing else.",
+            "body": {
+              "mode": "raw",
+              "raw": "// We register an email written in CAPITAL letters, like QACASE1756@example.com.\n// The number on the end is the clock, so this is always a new account.\n// The next request logs in with the very same email in small letters.\n{\n  \"email\": \"{{capitalisedEmail}}\",\n  \"password\": \"pass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We build the very same email twice: once in CAPITAL letters, once in small letters.",
+                  "// Nothing differs except the case - QACASE1756@example.com and qacase1756@example.com.",
+                  "",
+                  "const timestamp = Date.now();",
+                  "",
+                  "pm.collectionVariables.set('capitalisedEmail', 'QACASE' + timestamp + '@example.com');",
+                  "pm.collectionVariables.set('lowercaseEmail',   'qacase' + timestamp + '@example.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// This is setup only. It registers the CAPITAL letters version of the email.",
+                  "// We only check that it was created, nothing else.",
+                  "",
+                  "pm.test('Status is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[QUESTION-9] Capital letters make a different account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "We log in with the same email as above, but written in small letters. QACASE1756@example.com registered fine, yet qacase1756@example.com is refused, so the API sees them as two different people. See note 9 in BUGS.md.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The very same email as the request above, but all in small letters.\n// The API answers 401, so CAPITAL letters and small letters are two accounts.\n// Raised as a question, not a bug - see note 9 in BUGS.md.\n{\n  \"email\": \"{{lowercaseEmail}}\",\n  \"password\": \"pass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We log in with the same email as above, but written in small letters.",
+                  "// QACASE1756@example.com registered fine, yet qacase1756@example.com is refused,",
+                  "// so the API sees them as two different people. See note 9 in BUGS.md.",
+                  "",
+                  "pm.test('Status is 401 - the API treats CAPITAL letters as a different account', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('The address being tested was created by this run, so the result is reliable', function () {",
+                  "    const email = pm.collectionVariables.get('lowercaseEmail');",
+                  "    pm.expect(email).to.include('qacase');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Products - the list, one product, and the description rule",
+      "description": "The product list and single product responses, and the rule that a detailed product must carry a description. This is where bug 5 shows up.",
+      "item": [
+        {
+          "name": "Get all products and save the data for later tests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "description": "We get the product list and check every product looks correct. We then save a few real products to use in the order tests. Nothing is hard coded, so this still works after the data resets."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We get the product list and check every product looks correct.",
+                  "// We then save a few real products to use in the order tests.",
+                  "// Nothing is hard coded, so this still works after the data resets.",
+                  "",
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const products = pm.response.json();",
+                  "",
+                  "pm.test('Response is a list with at least one product in it', function () {",
+                  "    pm.expect(products).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "",
+                  "pm.test('Every product has id, name, price and stock, with the right types', function () {",
+                  "    products.forEach(function (product) {",
+                  "        pm.expect(product, 'this product: ' + JSON.stringify(product))",
+                  "          .to.include.all.keys('id', 'name', 'price', 'stock');",
+                  "",
+                  "        pm.expect(product.id).to.be.a('number');",
+                  "        pm.expect(product.name).to.be.a('string').and.not.empty;",
+                  "        pm.expect(product.price).to.be.a('number');",
+                  "        pm.expect(product.stock).to.be.a('number');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('No product has a negative price or negative stock', function () {",
+                  "    products.forEach(function (product) {",
+                  "        pm.expect(product.price, 'price of ' + product.name).to.be.at.least(0);",
+                  "        pm.expect(product.stock, 'stock of ' + product.name).to.be.at.least(0);",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Every product id appears only once', function () {",
+                  "    const allIds = products.map(function (product) { return product.id; });",
+                  "    const uniqueIds = new Set(allIds);",
+                  "    pm.expect(uniqueIds.size).to.eql(allIds.length);",
+                  "});",
+                  "",
+                  "const wellStockedProduct = products.find(function (product) {",
+                  "    return product.stock > 2;",
+                  "});",
+                  "if (wellStockedProduct) {",
+                  "    pm.collectionVariables.set('anyProductId', wellStockedProduct.id);",
+                  "    pm.collectionVariables.set('anyProductPrice', wellStockedProduct.price);",
+                  "}",
+                  "",
+                  "const leastStockedProduct = products.slice().sort(function (a, b) {",
+                  "    return a.stock - b.stock;",
+                  "})[0];",
+                  "if (leastStockedProduct) {",
+                  "    pm.collectionVariables.set('lowStockProductId', leastStockedProduct.id);",
+                  "    pm.collectionVariables.set('impossibleQty', leastStockedProduct.stock + 1000);",
+                  "}",
+                  "",
+                  "pm.collectionVariables.set('missingProductId', 999999);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Get one product by its id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{anyProductId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{anyProductId}}"
+              ]
+            },
+            "description": "We get one product and check it matches the one in the list. We use a real id saved by the request above, not a fixed number."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We get one product and check it matches the one in the list.",
+                  "// We use a real id saved by the request above, not a fixed number.",
+                  "",
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const product = pm.response.json();",
+                  "",
+                  "pm.test('The product returned is the one we asked for', function () {",
+                  "    const requestedId = pm.collectionVariables.get('anyProductId');",
+                  "    pm.expect(String(product.id)).to.eql(String(requestedId));",
+                  "});",
+                  "",
+                  "pm.test('It has id, name, price, stock and isDetailed', function () {",
+                  "    pm.expect(product).to.include.all.keys('id', 'name', 'price', 'stock', 'isDetailed');",
+                  "});",
+                  "",
+                  "pm.test('The price matches what GET /products said it was', function () {",
+                  "    const priceFromTheList = Number(pm.collectionVariables.get('anyProductPrice'));",
+                  "    pm.expect(product.price).to.eql(priceFromTheList);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BUG-5] A detailed product must have a description",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{productIdBeingChecked}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{productIdBeingChecked}}"
+              ]
+            },
+            "description": "A product marked as detailed must also have a description. Two products say they are detailed but have no description. That is bug 5. We check every product, one after another, not just a fixed few."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We take the next product id from the list and check that one.",
+                  "// It repeats until every product has been checked.",
+                  "",
+                  "if (!pm.collectionVariables.get('productsLeftToCheck')) {",
+                  "",
+                  "    pm.sendRequest(pm.variables.get('baseUrl') + '/products', function (error, response) {",
+                  "        if (error) { return; }",
+                  "",
+                  "        const allIds = response.json().map(function (product) { return product.id; });",
+                  "",
+                  "        pm.collectionVariables.set('productIdBeingChecked', allIds[0]);",
+                  "        pm.collectionVariables.set('productsLeftToCheck', JSON.stringify(allIds.slice(1)));",
+                  "    });",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// A product marked as detailed must also have a description.",
+                  "// Two products say they are detailed but have no description. That is bug 5.",
+                  "// We check every product, one after another, not just a fixed few.",
+                  "",
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const product = pm.response.json();",
+                  "",
+                  "pm.test('Product ' + product.id + ' (' + product.name + '): isDetailed=true means it must have a description', function () {",
+                  "    if (product.isDetailed === true) {",
+                  "        pm.expect(product, 'product ' + product.id).to.have.property('description');",
+                  "        pm.expect(product.description, 'description of product ' + product.id)",
+                  "          .to.be.a('string').and.not.empty;",
+                  "    }",
+                  "});",
+                  "",
+                  "let queue = pm.collectionVariables.get('productsLeftToCheck');",
+                  "queue = queue ? JSON.parse(queue) : [];",
+                  "",
+                  "if (queue.length > 0) {",
+                  "    const nextProductId = queue.shift();",
+                  "",
+                  "    pm.collectionVariables.set('productIdBeingChecked', nextProductId);",
+                  "    pm.collectionVariables.set('productsLeftToCheck', JSON.stringify(queue));",
+                  "",
+                  "    pm.execution.setNextRequest('[BUG-5] A detailed product must have a description');",
+                  "",
+                  "} else {",
+                  "    pm.collectionVariables.unset('productsLeftToCheck');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Unknown product id returns 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{missingProductId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{missingProductId}}"
+              ]
+            },
+            "description": "We ask for a product id that does not exist. The API should answer 404."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We ask for a product id that does not exist.",
+                  "// The API should answer 404.",
+                  "",
+                  "pm.test('Status is 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('There is an error message in the response', function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('error');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Orders - who is allowed to create and read them",
+      "description": "Tokens, and whether an order actually belongs to the person asking for it. This is where bug 2 shows up.",
+      "item": [
+        {
+          "name": "Ordering with no token is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We try to order without logging in. The API should refuse it with 401.",
+            "body": {
+              "mode": "raw",
+              "raw": "// A perfectly normal order for one item.\n// The point is what is missing: there is no Authorization header.\n// Expected: 401.\n{\n  \"items\": [\n    { \"productId\": {{anyProductId}}, \"qty\": 1 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We try to order without logging in.",
+                  "// The API should refuse it with 401.",
+                  "",
+                  "pm.test('Status is 401 Unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('No order was created', function () {",
+                  "    pm.expect(pm.response.json()).to.not.have.property('id');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Ordering with a fake token is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer this.is.not.a.real.token"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We try to order with a token we made up. The API should refuse it with 401 or 403.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The same normal order, but the token we send is made up.\n// Expected: 401 or 403.\n{\n  \"items\": [\n    { \"productId\": {{anyProductId}}, \"qty\": 1 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We try to order with a token we made up.",
+                  "// The API should refuse it with 401 or 403.",
+                  "",
+                  "pm.test('Status is 401 or 403', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});",
+                  "",
+                  "pm.test('No order was created', function () {",
+                  "    pm.expect(pm.response.json()).to.not.have.property('id');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reading an order with no token is refused",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{aliceOrderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{aliceOrderId}}"
+              ]
+            },
+            "description": "We try to read an order without logging in. The API should refuse it with 401."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We try to read an order without logging in.",
+                  "// The API should refuse it with 401.",
+                  "",
+                  "pm.test('Status is 401 Unauthorized', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('None of the order contents leaked into the response', function () {",
+                  "    pm.expect(pm.response.json()).to.not.have.property('items');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Alice can read her own order",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seededUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{aliceOrderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{aliceOrderId}}"
+              ]
+            },
+            "description": "Alice reads her own order. This should work, and the order should be hers."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Alice reads her own order.",
+                  "// This should work, and the order should be hers.",
+                  "",
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const order = pm.response.json();",
+                  "",
+                  "pm.test('The order belongs to the user who asked for it', function () {",
+                  "    pm.expect(order.user).to.eql(pm.environment.get('seededUserEmail'));",
+                  "});",
+                  "",
+                  "pm.test('The order has an id, a list of items and a numeric total', function () {",
+                  "    pm.expect(order).to.include.all.keys('id', 'items', 'total');",
+                  "    pm.expect(order.items).to.be.an('array').that.is.not.empty;",
+                  "    pm.expect(order.total).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BUG-2] Alice must not be able to read Bob's order",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seededUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{bobOrderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{bobOrderId}}"
+              ]
+            },
+            "description": "Alice asks for an order that belongs to bob. She should be refused with 403 or 404. She is not - she gets bob's whole order. That is bug 2."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Alice asks for an order that belongs to bob.",
+                  "// She should be refused with 403 or 404.",
+                  "// She is not - she gets bob's whole order. That is bug 2.",
+                  "",
+                  "pm.test('Status is 403 or 404 for somebody else\\'s order', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([403, 404]);",
+                  "});",
+                  "",
+                  "pm.test('Bob\\'s order details are not disclosed to alice', function () {",
+                  "    const body = pm.response.json();",
+                  "    const bobsAddress = pm.environment.get('bobUserEmail');",
+                  "    pm.expect(body.user, 'another user\\'s order leaked').to.not.eql(bobsAddress);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Unknown order id returns 404",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders/o-does-not-exist",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "o-does-not-exist"
+              ]
+            },
+            "description": "We ask for an order id that does not exist. The API should answer 404."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We ask for an order id that does not exist.",
+                  "// The API should answer 404.",
+                  "",
+                  "pm.test('Status is 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BY DESIGN] Seeded users cannot create orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{seededUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Alice is a demo user, so she is not allowed to place orders. This is on purpose, not a bug, so this test passes.",
+            "body": {
+              "mode": "raw",
+              "raw": "// A normal order, but sent as alice, who is a demo user.\n// Expected: 403. This is on purpose, not a bug - it protects the\n// shared demo data from everyone who tests this API.\n{\n  \"items\": [\n    { \"productId\": {{anyProductId}}, \"qty\": 1 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Alice is a demo user, so she is not allowed to place orders.",
+                  "// This is on purpose, not a bug, so this test passes.",
+                  "",
+                  "pm.test('Status is 403 Forbidden', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test('The error explains that seeded users cannot order', function () {",
+                  "    pm.expect(pm.response.json().error).to.match(/seeded/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - Orders - bad data the API should refuse",
+      "description": "Empty baskets, impossible quantities, unknown products and broken JSON. Bugs 4, 6 and 8 show up here.",
+      "item": [
+        {
+          "name": "An empty items list is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We send an order with an empty items list. The API should refuse it with 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "// An order with nothing in the basket.\n// An empty basket is not an order, so it must be refused.\n// Expected: 400.\n{\n  \"items\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We send an order with an empty items list.",
+                  "// The API should refuse it with 400.",
+                  "",
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('The error points at the items field', function () {",
+                  "    pm.expect(pm.response.json().error).to.match(/items/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "A quantity of 0 is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We order 0 of something. The API should refuse it with 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "// We ask for 0 of a real product.\n// The rule is at least 1, so 0 must be refused.\n// Expected: 400.\n{\n  \"items\": [\n    { \"productId\": {{anyProductId}}, \"qty\": 0 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We order 0 of something.",
+                  "// The API should refuse it with 400.",
+                  "",
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('The error points at the qty rule', function () {",
+                  "    pm.expect(pm.response.json().error).to.match(/qty/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "A quantity of 1.5 is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We order 1.5 of something. You cannot buy half an item, so the API should refuse it.",
+            "body": {
+              "mode": "raw",
+              "raw": "// We ask for 1.5 of a real product.\n// You cannot buy half an item, so this must be refused.\n// Expected: 400. Compare it with the next request.\n{\n  \"items\": [\n    { \"productId\": {{anyProductId}}, \"qty\": 1.5 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We order 1.5 of something.",
+                  "// You cannot buy half an item, so the API should refuse it.",
+                  "",
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BUG-6] A quantity sent as text must be refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We send the quantity as text (\"2\") instead of a number (2). The API should refuse it. It does not - it saves the text as it is. That is bug 6.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The quantity is \"2\" in quote marks, so it is text, not a number.\n// Should be: 400.\n// Actually: 201, and the text is saved on the order. That is bug 6.\n{\n  \"items\": [\n    { \"productId\": {{anyProductId}}, \"qty\": \"2\" }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We send the quantity as text (\"2\") instead of a number (2).",
+                  "// The API should refuse it.",
+                  "// It does not - it saves the text as it is. That is bug 6.",
+                  "",
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('No order is created from a quantity that is not a number', function () {",
+                  "    pm.expect(pm.response.json()).to.not.have.property('id');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Ordering a product that does not exist is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We order a product id that does not exist. The API should refuse it with 400 and say which product was wrong.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The product id here does not exist (999999).\n// Expected: 400, with an error naming the product.\n{\n  \"items\": [\n    { \"productId\": {{missingProductId}}, \"qty\": 1 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We order a product id that does not exist.",
+                  "// The API should refuse it with 400 and say which product was wrong.",
+                  "",
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('The error tells the user which thing was wrong - the product', function () {",
+                  "    pm.expect(pm.response.json().error).to.match(/product/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Ordering more than the stock is refused",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We order far more than the shop has. The API should refuse it with 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The product with the least stock, asking for 1000 more than it has.\n// Both values were read from the live product list a moment ago.\n// Expected: 409.\n{\n  \"items\": [\n    { \"productId\": {{lowStockProductId}}, \"qty\": {{impossibleQty}} }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We order far more than the shop has.",
+                  "// The API should refuse it with 409.",
+                  "",
+                  "pm.test('Status is 409 Conflict', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('The error explains that there is not enough stock', function () {",
+                  "    pm.expect(pm.response.json().error).to.match(/stock/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Ordering exactly the available stock is accepted",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We order exactly the amount left in stock. That is allowed, so this should work.",
+            "body": {
+              "mode": "raw",
+              "raw": "// We ask for exactly the amount left in stock, no more.\n// That is allowed, so this must work.\n// Expected: 201.\n{\n  \"items\": [\n    { \"productId\": {{exactStockProductId}}, \"qty\": {{exactStockQty}} }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We read the products first and pick one, then order exactly its stock.",
+                  "// We read the stock live, so a data reset cannot break this.",
+                  "",
+                  "pm.sendRequest(pm.variables.get('baseUrl') + '/products', function (error, response) {",
+                  "    if (error) { return; }",
+                  "",
+                  "    const productsInStock = response.json().filter(function (product) {",
+                  "        return product.stock > 0;",
+                  "    });",
+                  "",
+                  "    const smallestStock = productsInStock.sort(function (a, b) {",
+                  "        return a.stock - b.stock;",
+                  "    })[0];",
+                  "",
+                  "    if (!smallestStock) {",
+                  "        console.log('Skipping: no product currently has any stock.');",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    pm.collectionVariables.set('exactStockProductId', smallestStock.id);",
+                  "    pm.collectionVariables.set('exactStockQty', smallestStock.stock);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We order exactly the amount left in stock.",
+                  "// That is allowed, so this should work.",
+                  "",
+                  "pm.test('Status is 201 Created - buying the last of something is allowed', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BUG-4] Two lines can beat the stock check",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We ask for the same product twice, on two lines of one order. Added together it is more than the shop has, so it should be refused with 409. It is not - the order is created. That is bug 4.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The same product on two lines, each asking for all the stock.\n// Added together that is double what the shop actually has.\n// Should be: 409. Actually: 201. That is bug 4.\n{\n  \"items\": [\n    { \"productId\": {{oversellProductId}}, \"qty\": {{oversellQty}} },\n    { \"productId\": {{oversellProductId}}, \"qty\": {{oversellQty}} }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We find the product with the least stock and ask for all of it, twice.",
+                  "// Each line looks fine on its own, but together they are too many.",
+                  "",
+                  "pm.sendRequest(pm.variables.get('baseUrl') + '/products', function (error, response) {",
+                  "    if (error) { return; }",
+                  "",
+                  "    const productsInStock = response.json().filter(function (product) {",
+                  "        return product.stock > 0;",
+                  "    });",
+                  "",
+                  "    const smallestStock = productsInStock.sort(function (a, b) {",
+                  "        return a.stock - b.stock;",
+                  "    })[0];",
+                  "",
+                  "    if (!smallestStock) {",
+                  "        console.log('Skipping: no product currently has any stock.');",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    pm.collectionVariables.set('oversellProductId', smallestStock.id);",
+                  "    pm.collectionVariables.set('oversellQty', smallestStock.stock);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We ask for the same product twice, on two lines of one order.",
+                  "// Added together it is more than the shop has, so it should be refused with 409.",
+                  "// It is not - the order is created. That is bug 4.",
+                  "",
+                  "pm.test('Status is 409 Conflict - the combined quantity is more than we have', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('No order is created that oversells the product', function () {",
+                  "    pm.expect(pm.response.json()).to.not.have.property('id');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BUG-8] A broken request must return JSON, not a web page",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We send a body that is not proper JSON. The error should come back as JSON like every other error. It comes back as an HTML web page instead. That is bug 8.",
+            "body": {
+              "mode": "raw",
+              "raw": "// This body is cut off on purpose - it is not proper JSON.\n// Should be: 400 with a JSON error like every other error.\n// Actually: 400 with an HTML web page. That is bug 8.\n{\"items\": [",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We send a body that is not proper JSON.",
+                  "// The error should come back as JSON like every other error.",
+                  "// It comes back as an HTML web page instead. That is bug 8.",
+                  "",
+                  "pm.test('Status is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('The error is JSON, not an HTML page', function () {",
+                  "    const contentType = pm.response.headers.get('Content-Type') || '';",
+                  "    pm.expect(contentType).to.include('json');",
+                  "});",
+                  "",
+                  "pm.test('A client can read the error without crashing', function () {",
+                  "    pm.expect(function () { pm.response.json(); }).to.not.throw();",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07 - Orders - totals, stock and ownership",
+      "description": "Whether the price maths adds up, whether stock goes down after a sale, and whether a stranger can read the order. Bugs 3, 7 and 2 show up here.",
+      "item": [
+        {
+          "name": "Ordering one item works",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We order one item and check the order is created correctly. The total is right here, because one times the price is just the price.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The normal happy path: one product, one of them.\n// The total is correct here only because multiplying by 1 changes\n// nothing. The next order of 2 is where it goes wrong.\n{\n  \"items\": [\n    { \"productId\": {{anyProductId}}, \"qty\": 1 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We order one item and check the order is created correctly.",
+                  "// The total is right here, because one times the price is just the price.",
+                  "",
+                  "pm.test('Status is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const order = pm.response.json();",
+                  "",
+                  "pm.test('The order has an id, the items we sent, and a numeric total', function () {",
+                  "    pm.expect(order).to.include.all.keys('id', 'items', 'total');",
+                  "    pm.expect(order.items).to.be.an('array').with.lengthOf(1);",
+                  "    pm.expect(order.total).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('The order belongs to the user who placed it', function () {",
+                  "    pm.expect(order.user).to.eql(pm.collectionVariables.get('testUserEmail'));",
+                  "});",
+                  "",
+                  "pm.test('The total matches the price of the product', function () {",
+                  "    const price = Number(pm.collectionVariables.get('anyProductPrice'));",
+                  "    pm.expect(order.total).to.eql(price);",
+                  "});",
+                  "",
+                  "if (order.id) {",
+                  "    pm.collectionVariables.set('createdOrderId', order.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Read back the order that was just placed",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{createdOrderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{createdOrderId}}"
+              ]
+            },
+            "description": "We read back the order that was just created and check it matches. We use the order id saved by the request above."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We read back the order that was just created and check it matches.",
+                  "// We use the order id saved by the request above.",
+                  "",
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const order = pm.response.json();",
+                  "",
+                  "pm.test('The id matches the order we created', function () {",
+                  "    pm.expect(order.id).to.eql(pm.collectionVariables.get('createdOrderId'));",
+                  "});",
+                  "",
+                  "pm.test('The order is recorded against the logged-in user', function () {",
+                  "    pm.expect(order.user).to.eql(pm.collectionVariables.get('testUserEmail'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BUG-3] Ordering 2 of something must cost twice as much",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We order 2 of the same item that we ordered 1 of a moment ago. The total should be the price times 2. The API charges for only 1. That is bug 3.",
+            "body": {
+              "mode": "raw",
+              "raw": "// The same product we ordered 1 of a moment ago, but 2 of them this time.\n// Should be: total = price x 2.\n// Actually: total = the price of one. That is bug 3.\n{\n  \"items\": [\n    { \"productId\": {{anyProductId}}, \"qty\": 2 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We order 2 of the same item that we ordered 1 of a moment ago.",
+                  "// The total should be the price times 2.",
+                  "// The API charges for only 1. That is bug 3.",
+                  "",
+                  "pm.test('Status is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const order = pm.response.json();",
+                  "",
+                  "const price = Number(pm.collectionVariables.get('anyProductPrice'));",
+                  "const quantity = 2;",
+                  "const whatItShouldCost = price * quantity;",
+                  "",
+                  "pm.test('Total should be ' + price + ' x ' + quantity + ' = ' + whatItShouldCost, function () {",
+                  "    pm.expect(order.total).to.eql(whatItShouldCost);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Set up - record the stock levels before ordering",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "description": "This is setup only. We write down the stock level before we order. Later we read it again and compare, so a data reset cannot break the test."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// This is setup only. We write down the stock level before we order.",
+                  "// Later we read it again and compare, so a data reset cannot break the test.",
+                  "",
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const products = pm.response.json();",
+                  "",
+                  "const ourProduct = products.find(function (product) {",
+                  "    return String(product.id) === String(pm.collectionVariables.get('anyProductId'));",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('stockBeforeOrdering', ourProduct.stock);",
+                  "",
+                  "console.log('Stock of product ' + ourProduct.id + ' before ordering: ' + ourProduct.stock);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BUG-3] An order with two products must add up correctly",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{testUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "We order two different products, one of them twice. The total should add up correctly. It does not - each price is counted once. That is bug 3.",
+            "body": {
+              "mode": "raw",
+              "raw": "// One of the first product, and two of the second.\n// The correct total was worked out from live prices already.\n// Should be: both lines counted properly. Actually: each price\n// is counted once, so the total is short. That is bug 3.\n{\n  \"items\": [\n    { \"productId\": {{firstProductId}}, \"qty\": 1 },\n    { \"productId\": {{secondProductId}}, \"qty\": 2 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We pick two real products and work out what the total should be.",
+                  "// We use live prices, so the sum is right whatever the data says today.",
+                  "",
+                  "pm.sendRequest(pm.variables.get('baseUrl') + '/products', function (error, response) {",
+                  "    if (error) { return; }",
+                  "",
+                  "    const available = response.json().filter(function (product) {",
+                  "        return product.stock >= 3;",
+                  "    });",
+                  "",
+                  "    const firstProduct  = available[0];",
+                  "    const secondProduct = available[1] || available[0];",
+                  "",
+                  "    pm.collectionVariables.set('firstProductId', firstProduct.id);",
+                  "    pm.collectionVariables.set('secondProductId', secondProduct.id);",
+                  "",
+                  "    const correctTotal = (firstProduct.price * 1) + (secondProduct.price * 2);",
+                  "    pm.collectionVariables.set('correctMultiItemTotal', correctTotal);",
+                  "",
+                  "    console.log('This order should cost: ' + firstProduct.price + ' x 1 + ' +",
+                  "                secondProduct.price + ' x 2 = ' + correctTotal);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// We order two different products, one of them twice.",
+                  "// The total should add up correctly.",
+                  "// It does not - each price is counted once. That is bug 3.",
+                  "",
+                  "pm.test('Status is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const order = pm.response.json();",
+                  "",
+                  "pm.test('The total adds up price x qty across every line', function () {",
+                  "    const correctTotal = Number(pm.collectionVariables.get('correctMultiItemTotal'));",
+                  "    pm.expect(order.total).to.eql(correctTotal);",
+                  "});",
+                  "",
+                  "pm.test('Both order lines were saved', function () {",
+                  "    pm.expect(order.items).to.be.an('array').with.lengthOf(2);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BUG-7] Stock must go down after a sale",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "description": "The orders above all went through, so we look at the stock one more time. It should be lower than the number we wrote down earlier. It is exactly the same. That is bug 7."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// The orders above all went through, so we look at the stock one more time.",
+                  "// It should be lower than the number we wrote down earlier.",
+                  "// It is exactly the same. That is bug 7.",
+                  "",
+                  "pm.test('Status is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const products = pm.response.json();",
+                  "",
+                  "const ourProduct = products.find(function (product) {",
+                  "    return String(product.id) === String(pm.collectionVariables.get('anyProductId'));",
+                  "});",
+                  "",
+                  "const stockBefore = Number(pm.collectionVariables.get('stockBeforeOrdering'));",
+                  "const stockNow = ourProduct.stock;",
+                  "",
+                  "console.log('Stock before ordering: ' + stockBefore + '   |   stock now: ' + stockNow);",
+                  "",
+                  "pm.test('Stock for product ' + ourProduct.id + ' is lower than it was before we ordered', function () {",
+                  "    pm.expect(stockNow, 'stock was ' + stockBefore + ' before we placed the orders')",
+                  "      .to.be.below(stockBefore);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[BUG-2] A stranger must not be able to read another user's order",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{secondUserToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{createdOrderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders",
+                "{{createdOrderId}}"
+              ]
+            },
+            "description": "The second user asks for the first user's order. They are strangers, so this should be refused. It is not - the order is handed over. That is bug 2."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// The second user asks for the first user's order.",
+                  "// They are strangers, so this should be refused.",
+                  "// It is not - the order is handed over. That is bug 2.",
+                  "",
+                  "pm.test('Status is 403 or 404 - this order is not theirs', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([403, 404]);",
+                  "});",
+                  "",
+                  "pm.test('The first user\\'s order is not handed to a different user', function () {",
+                  "    const body = pm.response.json();",
+                  "    const orderOwner = pm.collectionVariables.get('testUserEmail');",
+                  "    pm.expect(body.user, 'this order belongs to somebody else').to.not.eql(orderOwner);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// ===========================================================================",
+          "// RUNS BEFORE EVERY SINGLE REQUEST IN THE COLLECTION",
+          "// ---------------------------------------------------------------------------",
+          "// Nothing needs setting up globally, so there is no code here.",
+          "// Each request prepares its own data in its own \"Pre-request Script\" tab.",
+          "//",
+          "// One note for anyone editing those scripts. Where they call the API directly with",
+          "// pm.sendRequest, they read the address with:",
+          "//",
+          "//     pm.variables.get('baseUrl')",
+          "//",
+          "// and not pm.environment.get or pm.collectionVariables.get. pm.variables looks in",
+          "// every scope at once, so the scripts keep working whether baseUrl is set in the",
+          "// environment file, on the collection, or passed in on the command line.",
+          "// ==========================================================================="
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// ===========================================================================",
+          "// RUNS AFTER EVERY SINGLE REQUEST IN THE COLLECTION",
+          "// ---------------------------------------------------------------------------",
+          "// Two checks we want on absolutely every response, so we write them once here",
+          "// instead of copying them into every request.",
+          "// ===========================================================================",
+          "",
+          "// CHECK 1: the API answered quickly enough.",
+          "// 5 seconds is generous. If we ever breach it, something is badly wrong.",
+          "pm.test('Responded in under 5 seconds', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "// CHECK 2: the API answered with JSON.",
+          "// This is a REST API, so every response - success or error - should be JSON.",
+          "// This single check is what caught defect 8: one error path returns an HTML",
+          "// page, which would crash any client that calls response.json() on it.",
+          "pm.test('Responded with JSON, not HTML or plain text', function () {",
+          "    const contentType = pm.response.headers.get('Content-Type') || '';",
+          "    pm.expect(contentType).to.include('json');",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "testUserEmail",
+      "value": ""
+    },
+    {
+      "key": "testUserPassword",
+      "value": ""
+    },
+    {
+      "key": "testUserToken",
+      "value": ""
+    },
+    {
+      "key": "secondUserEmail",
+      "value": ""
+    },
+    {
+      "key": "secondUserToken",
+      "value": ""
+    },
+    {
+      "key": "seededUserToken",
+      "value": ""
+    },
+    {
+      "key": "anyProductId",
+      "value": ""
+    },
+    {
+      "key": "anyProductPrice",
+      "value": ""
+    },
+    {
+      "key": "lowStockProductId",
+      "value": ""
+    },
+    {
+      "key": "impossibleQty",
+      "value": ""
+    },
+    {
+      "key": "missingProductId",
+      "value": ""
+    },
+    {
+      "key": "createdOrderId",
+      "value": ""
+    }
+  ]
+}
